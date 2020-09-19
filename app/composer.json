@@ -25,18 +25,24 @@
         "symfony/serializer-pack": "^1.0",
         "symfony/thanks": "^1.2",
         "symfony/validator": "4.4.*",
-        "symfony/yaml": "4.4.*"
+        "symfony/yaml": "4.4.*",
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
         "phpmd/phpmd": "^2.8",
         "phpstan/phpstan": "^0.12.11",
         "phpstan/phpstan-beberlei-assert": "^0.12.2",
         "phpstan/phpstan-doctrine": "^0.12.9",
         "phpstan/phpstan-symfony": "^0.12.4",
+        "phpunit/phpunit": "^9.3",
+        "squizlabs/php_codesniffer": "^3.5",
+        "symfony/browser-kit": "^4.4",
+        "symfony/css-selector": "^4.4",
         "symfony/maker-bundle": "^1.14",
         "symfony/phpunit-bridge": "^5.0",
         "symfony/profiler-pack": "^1.0",
-        "symfony/test-pack": "^1.0",
         "theofidry/psysh-bundle": "^4.0",
         "vimeo/psalm": "^3.9"
     },
@@ -75,7 +81,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "phpmd": "phpmd src/ xml phpmd.xml",
+        "phpcs": "phpcs -d memory_limit=32M src/",
+        "phpcbf": "phpcbf -d memory_limit=32M src/",
+        "phpstan": "phpstan analyse src -c phpstan.neon.dist",
+        "php-cs-fixer": "php-cs-fixer fix tests/ src/ --config=.php_cs.dist -v --show-progress=dots --using-cache=no --diff",
+        "phpunit": "bin/phpunit --testdox --coverage-html tests/coverage",
+        "phpunit-domain": "bin/phpunit tests/unit/Order/Domain --testdox --coverage-html tests/coverage"
     },
     "conflict": {
         "symfony/symfony": "*"

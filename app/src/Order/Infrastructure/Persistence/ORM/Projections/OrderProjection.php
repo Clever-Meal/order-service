@@ -24,11 +24,13 @@ final class OrderProjection implements ReadModelProjection
                         'catalog_flow_id' => $event->catalogFlow()->catalogFlowId()->toString(),
                         'catalog_flow_version' => $event->catalogFlow()->version(),
                         'table_identifier' => $event->tableIdentifier()->toString(),
+                        'items' => $event->items()->__toString(),
                         'status' => $event->status()->toString(),
                     ]);
                 },
                 OrderWasCanceled::class => function ($state, OrderWasCanceled $event) use ($readModel) {
-                    $readModel->stack('update',
+                    $readModel->stack(
+                        'update',
                         [
                             'status' => $event->status()->toString(),
                         ],
@@ -38,7 +40,8 @@ final class OrderProjection implements ReadModelProjection
                     );
                 },
                 OrderWasDelivered::class => function ($state, OrderWasDelivered $event) use ($readModel) {
-                    $readModel->stack('update',
+                    $readModel->stack(
+                        'update',
                         [
                             'status' => $event->status()->toString(),
                         ],

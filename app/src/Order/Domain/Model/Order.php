@@ -19,7 +19,7 @@ use App\Shared\EntityInterface;
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventSourcing\AggregateRoot;
 
-class Order extends AggregateRoot implements EntityInterface
+final class Order extends AggregateRoot implements EntityInterface
 {
     private OrderId $orderId;
 
@@ -42,36 +42,42 @@ class Order extends AggregateRoot implements EntityInterface
     ): Order {
         $self = new self();
 
-        $self->recordThat(OrderWasRequested::withData(
-            $orderId,
-            $establishment,
-            $catalogFlow,
-            $tableIdentifier,
-            $items,
-            Status::waiting()
-        ));
+        $self->recordThat(
+            OrderWasRequested::withData(
+                $orderId,
+                $establishment,
+                $catalogFlow,
+                $tableIdentifier,
+                $items,
+                Status::waiting()
+            )
+        );
 
         return $self;
     }
 
     public function deliver(): Order
     {
-        if ($this->status === Status::canceled()) {
+        if ($this->status->status() === Status::canceled()->status()) {
             throw new CannotDeliverCanceledOrderException();
         }
 
         $this->recordThat(OrderWasDelivered::withData($this->orderId, Status::delivered()));
+
+        $this->status = Status::delivered();
 
         return $this;
     }
 
     public function cancel(): Order
     {
-        if ($this->status === Status::delivered()) {
+        if ($this->status->status() === Status::delivered()->status()) {
             throw new CannotCancelDeliveredOrderException();
         }
 
         $this->recordThat(OrderWasCanceled::withData($this->orderId, Status::canceled()));
+
+        $this->status = Status::canceled();
 
         return $this;
     }
@@ -86,7 +92,7 @@ class Order extends AggregateRoot implements EntityInterface
         return $this->items;
     }
 
-    protected function aggregateId(): string
+    public function aggregateId(): string
     {
         return $this->orderId->toString();
     }
@@ -138,7 +144,6 @@ class Order extends AggregateRoot implements EntityInterface
                 $this->tableIdentifier = $event->tableIdentifier();
                 $this->items = $event->items();
                 $this->status = $event->status();
-
                 break;
 
             case OrderWasCanceled::class:

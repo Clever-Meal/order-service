@@ -29,18 +29,21 @@ final class ItemCollectionTest extends TestCase
 
     public function testFromArray(): void
     {
-        $item = $this->item();
         $collection = ItemCollection::fromArray([
             [
                 'uuid' => Uuid::uuid4()->toString(),
+                'name' => 'Gatorade',
                 'type' => ProductType::DRINK,
-                'quantity' => 1
+                'quantity' => 1,
+                'version' => 2,
             ],
             [
                 'uuid' => Uuid::uuid4()->toString(),
+                'name' => 'Nacho supreme',
                 'type' => ProductType::FOOD,
-                'quantity' => 2
-            ]
+                'quantity' => 2,
+                'version' => 5,
+            ],
         ]);
         $this->assertCount(2, $collection);
     }
@@ -65,7 +68,6 @@ final class ItemCollectionTest extends TestCase
         $this->assertEquals(0, $collection->count());
         $newCollection = $collection->push($this->item());
         $this->assertEquals(1, $newCollection->count());
-
     }
 
     public function testEmptyList(): void
@@ -110,8 +112,10 @@ final class ItemCollectionTest extends TestCase
     {
         return Item::fromArray([
             'uuid' => Uuid::uuid4()->toString(),
+            'name' => 'Vegan Chili beans',
             'type' => ProductType::FOOD,
-            'quantity' => 2
+            'quantity' => 2,
+            'version' => 1,
         ]);
     }
 }
